@@ -1,4 +1,5 @@
 import openai
+from flask import Flask, request, jsonify
 
 # Set the Groq API base URL and your API key
 openai.api_base = "https://api.groq.com/openai/v1"
@@ -14,7 +15,7 @@ You are an expert on Composite Labs and Monad. Provide concise, accurate, and re
 - Unique features: central limit order book (CLOB), cross-margin mechanism, enhanced leverage, and low fees.
 - Builds on the Monad blockchain for scalability and efficiency.
 
-### Monad:hi
+### Monad:
 - A high-performance layer 1 blockchain designed for 10,000 transactions per second, 1-second block times, and single-slot finality.
 - 100% Ethereum Virtual Machine (EVM) compatible.
 - Innovations include optimistic parallel execution, asynchronous execution, and MonadDB for efficient state storage.
@@ -27,40 +28,39 @@ conversation_history = [
     {"role": "system", "content": initial_context}
 ]
 
+# Flask app setup
+app = Flask(__name__)
 
+@app.route('/chat', methods=['POST'])
 def chatbot():
-    print("Chatbot is ready to discuss Composite Labs and Monad! Type 'exit' to end the chat.\n")
+    user_input = request.json.get("user_input")
+    if not user_input:
+        return jsonify({"error": "No user input provided"}), 400
 
-    while True:
-        # Get user input
-        user_input = input("You: ")
-        if user_input.lower() == "exit":
-            print("Chatbot: Goodbye!")
-            break
+    # Add user's input to the conversation history
+    conversation_history.append({"role": "user", "content": user_input})
 
-        # Add user's input to the conversation history
-        conversation_history.append({"role": "user", "content": user_input})
+    try:
+        # Call the Groq API for chat completion using a Llama model
+        response = openai.ChatCompletion.create(
+            model="llama-3.3-70b-versatile",  # Use an accessible Llama model
+            messages=conversation_history,
+            temperature=0.5,
+            max_tokens=256,
+            top_p=1.0
+        )
 
-        try:
-            # Call the Groq API for chat completion using a Llama model
-            response = openai.ChatCompletion.create(
-                model="llama-3.3-70b-versatile",  # Use an accessible Llama model
-                messages=conversation_history,
-                temperature=0.5,
-                max_tokens=256,
-                top_p=1.0
-            )
+        # Extract assistant's response
+        assistant_message = response["choices"][0]["message"]["content"]
+        
+        # Add assistant's response to the conversation history
+        conversation_history.append({"role": "assistant", "content": assistant_message})
 
-            # Extract and print the assistant's response
-            assistant_message = response["choices"][0]["message"]["content"]
-            print(f"Chatbot: {assistant_message}")
+        # Return the assistant's response in JSON format
+        return jsonify({"response": assistant_message})
 
-            # Add the assistant's response to the conversation history
-            conversation_history.append({"role": "assistant", "content": assistant_message})
-
-        except Exception as e:
-            print(f"Chatbot: Sorry, something went wrong. ({e})")
-
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    chatbot()
+    app.run(debug=True, host='0.0.0.0', port=5000)
