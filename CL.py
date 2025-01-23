@@ -1,6 +1,5 @@
 import openai
 from flask import Flask, request, jsonify
-import os
 
 # Set the Groq API base URL and your API key
 openai.api_base = "https://api.groq.com/openai/v1"
@@ -32,22 +31,22 @@ conversation_history = [
 # Flask app setup
 app = Flask(__name__)
 
+# Home route (root URL)
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({"message": "Welcome to the chatbot API!"})
+
+# Chat route
 @app.route('/chat', methods=['POST'])
 def chatbot():
+    user_input = request.json.get("user_input")
+    if not user_input:
+        return jsonify({"error": "No user input provided"}), 400
+
+    # Add user's input to the conversation history
+    conversation_history.append({"role": "user", "content": user_input})
+
     try:
-        # Check if the request contains JSON data
-        if not request.is_json:
-            return jsonify({"error": "Invalid content type. Please send JSON."}), 400
-        
-        # Get user input from the JSON body
-        user_input = request.json.get("user_input")
-        
-        if not user_input:
-            return jsonify({"error": "No user input provided"}), 400
-
-        # Add user's input to the conversation history
-        conversation_history.append({"role": "user", "content": user_input})
-
         # Call the Groq API for chat completion using a Llama model
         response = openai.ChatCompletion.create(
             model="llama-3.3-70b-versatile",  # Use an accessible Llama model
@@ -69,7 +68,6 @@ def chatbot():
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
+# Start the Flask app
 if __name__ == "__main__":
-    # Use the environment variable for the port if available (for deployment)
-    port = int(os.environ.get("PORT", 5000))
-    app.run(debug=True, host='0.0.0.0', port=port)
+    app.run(debug=True, host='0.0.0.0', port=5000)
