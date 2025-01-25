@@ -6,7 +6,7 @@ from IPython import get_ipython
 app = Flask(__name__)
 
 # Set the OpenAI API base URL and your API key
-openai.api_base = "https://api.openai.com/v1"
+openai.api_base = "https://api.groq.com/openai/v1"
 openai.api_key = "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"  # Replace with your actual OpenAI API key
 
 # Initial knowledge about Composite Labs and Monad
