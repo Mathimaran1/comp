@@ -7,23 +7,22 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Welcome to the Composite Labs Chatbot</h1>
-    <p>Type your question below, and the bot will respond:</p>
-
-    <form action="/chat" method="post">
-        <input type="text" name="message" placeholder="Ask about Composite Labs or Monad..." required>
-        <button type="submit">Send</button>
-    </form>
-
-    {% if user_input %}
     <div class="chat-container">
-        <div class="message user-message">
-            <strong>You:</strong> {{ user_input }}
+        <h1>Welcome to the Composite Labs Chatbot</h1>
+        <p>Type your question below, and the bot will respond:</p>
+
+        <div class="chat-history">
+            {% for message in conversation_history %}
+                <div class="message {{ 'user-message' if message['role'] == 'user' else 'assistant-message' }}">
+                    <strong>{{ message['role'].capitalize() }}:</strong> {{ message['content'] }}
+                </div>
+            {% endfor %}
         </div>
-        <div class="message assistant-message">
-            <strong>Assistant:</strong> {{ assistant_response }}
-        </div>
+
+        <form action="/chat" method="post" class="chat-form">
+            <input type="text" name="message" placeholder="Ask about Composite Labs or Monad..." required>
+            <button type="submit">Send</button>
+        </form>
     </div>
-    {% endif %}
 </body>
 </html>
