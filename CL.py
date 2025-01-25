@@ -5,32 +5,11 @@ from IPython import get_ipython
 
 app = Flask(__name__)
 
-# Set the OpenAI API base URL and your API key
+# Set the Groq API base URL and your API key for OpenAI
 openai.api_base = "https://api.groq.com/openai/v1"
 openai.api_key = "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"  # Replace with your actual OpenAI API key
 
-# Initial knowledge about Composite Labs and Monad
-initial_context = """
-You are an expert on Composite Labs and Monad. Provide concise, accurate, and relevant answers to user queries.
-
-### Composite Labs:
-- A venture-backed startup developing a next-generation decentralized exchange (DEX) entirely on-chain.
-- Key offerings: spot trading, perpetual contracts, and on-chain lending.
-- Unique features: central limit order book (CLOB), cross-margin mechanism, enhanced leverage, and low fees.
-- Builds on the Monad blockchain for scalability and efficiency.
-
-### Monad:
-- A high-performance layer 1 blockchain designed for 10,000 transactions per second, 1-second block times, and single-slot finality.
-- 100% Ethereum Virtual Machine (EVM) compatible.
-- Innovations include optimistic parallel execution, asynchronous execution, and MonadDB for efficient state storage.
-- Backed by $225M funding from Paradigm, Electric Capital, and Greenoaks.
-
-Answer queries in a professional manner, sticking to the scope of Composite Labs and Monad.
-"""
-
-conversation_history = [
-    {"role": "system", "content": initial_context}
-]
+conversation_history = []
 
 def execute_code(code):
     try:
@@ -58,10 +37,15 @@ def chat():
     # Add user's input to the conversation history
     conversation_history.append({"role": "user", "content": user_input})
 
+    # Create a dynamic system prompt or fetch data from external sources if needed
+    system_prompt = "You are an expert chatbot. Provide concise, accurate, and relevant answers to user queries."
+    if len(conversation_history) == 1:  # If it's the first query
+        conversation_history.insert(0, {"role": "system", "content": system_prompt})
+
     try:
-        # Call the OpenAI API for chat completion
+        # Call the OpenAI API for chat completion using the specified model and API URL
         response = openai.ChatCompletion.create(
-            model="llama-3.3-70b-versatile",  # Use a valid OpenAI model
+            model="llama-3.3-70b-versatile",  # Use the Llama model as requested
             messages=conversation_history,
             temperature=0.5,
             max_tokens=256,
