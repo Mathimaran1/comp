@@ -1,10 +1,13 @@
+from flask import Flask, request, jsonify
 import openai
 from IPython.display import display, Markdown
 from IPython import get_ipython
 
+app = Flask(__name__)
+
 # Set the OpenAI API base URL and your API key
 openai.api_base = "https://api.openai.com/v1"
-openai.api_key = "your_openai_api_key_here"
+openai.api_key = "your_openai_api_key_here"  # Replace with your actual OpenAI API key
 
 # Initial knowledge about Composite Labs and Monad
 initial_context = """
@@ -42,45 +45,41 @@ def execute_code(code):
     except Exception as e:
         return f"Error executing code: {e}"
 
-def chatbot():
-    print("Chatbot is ready to discuss Composite Labs and Monad! Type 'exit' to end the chat.\n")
+@app.route('/chat', methods=['POST'])
+def chat():
+    user_input = request.json.get('message')
+    if user_input.lower() == "exit":
+        return jsonify({"response": "Goodbye!"})
 
-    while True:
-        # Get user input
-        user_input = input("You: ")
-        if user_input.lower() == "exit":
-            print("Chatbot: Goodbye!")
-            break
+    # Add user's input to the conversation history
+    conversation_history.append({"role": "user", "content": user_input})
 
-        # Add user's input to the conversation history
-        conversation_history.append({"role": "user", "content": user_input})
+    try:
+        # Call the OpenAI API for chat completion
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # Use a valid OpenAI model
+            messages=conversation_history,
+            temperature=0.5,
+            max_tokens=256,
+            top_p=1.0
+        )
 
-        try:
-            # Call the OpenAI API for chat completion
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",  # Use a valid OpenAI model
-                messages=conversation_history,
-                temperature=0.5,
-                max_tokens=256,
-                top_p=1.0
-            )
+        # Extract the assistant's response
+        assistant_message = response["choices"][0]["message"]["content"]
 
-            # Extract and print the assistant's response
-            assistant_message = response["choices"][0]["message"]["content"]
+        # Check if the response contains code to execute
+        if "```python" in assistant_message:
+            code_block = assistant_message.split("```python")[1].split("```")[0].strip()
+            code_output = execute_code(code_block)
+            assistant_message += f"\n\nCode Output:\n```\n{code_output}\n```"
 
-            # Check if the response contains code to execute
-            if "```python" in assistant_message:
-                code_block = assistant_message.split("```python")[1].split("```")[0].strip()
-                code_output = execute_code(code_block)
-                assistant_message += f"\n\nCode Output:\n```\n{code_output}\n```"
+        # Add the assistant's response to the conversation history
+        conversation_history.append({"role": "assistant", "content": assistant_message})
 
-            print(f"Chatbot: {assistant_message}")
+        return jsonify({"response": assistant_message})
 
-            # Add the assistant's response to the conversation history
-            conversation_history.append({"role": "assistant", "content": assistant_message})
+    except Exception as e:
+        return jsonify({"response": f"Sorry, something went wrong. ({e})"})
 
-        except Exception as e:
-            print(f"Chatbot: Sorry, something went wrong. ({e})")
-
-if __name__ == "__main__":
-    chatbot()
+if __name__ == '__main__':
+    app.run(debug=True)
