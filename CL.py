@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import openai
 from IPython.display import display, Markdown
 from IPython import get_ipython
@@ -45,11 +45,15 @@ def execute_code(code):
     except Exception as e:
         return f"Error executing code: {e}"
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.route('/chat', methods=['POST'])
 def chat():
-    user_input = request.json.get('message')
+    user_input = request.form.get('message')
     if user_input.lower() == "exit":
-        return jsonify({"response": "Goodbye!"})
+        return render_template('index.html', user_input=user_input, assistant_response="Goodbye!")
 
     # Add user's input to the conversation history
     conversation_history.append({"role": "user", "content": user_input})
@@ -76,10 +80,10 @@ def chat():
         # Add the assistant's response to the conversation history
         conversation_history.append({"role": "assistant", "content": assistant_message})
 
-        return jsonify({"response": assistant_message})
+        return render_template('index.html', user_input=user_input, assistant_response=assistant_message)
 
     except Exception as e:
-        return jsonify({"response": f"Sorry, something went wrong. ({e})"})
+        return render_template('index.html', user_input=user_input, assistant_response=f"Sorry, something went wrong. ({e})")
 
 if __name__ == '__main__':
     app.run(debug=True)
