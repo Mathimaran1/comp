@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 # Set the OpenAI API base URL and your API key
 openai.api_base = "https://api.openai.com/v1"
-openai.api_key = "your_openai_api_key_here"  # Replace with your actual OpenAI API key
+openai.api_key = "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"  # Replace with your actual OpenAI API key
 
 # Initial knowledge about Composite Labs and Monad
 initial_context = """
