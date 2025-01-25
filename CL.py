@@ -61,7 +61,7 @@ def chat():
     try:
         # Call the OpenAI API for chat completion
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # Use a valid OpenAI model
+            model="llama-3.3-70b-versatile",  # Use a valid OpenAI model
             messages=conversation_history,
             temperature=0.5,
             max_tokens=256,
