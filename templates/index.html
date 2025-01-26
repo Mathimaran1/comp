@@ -3,86 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Composite Labs and Monad Chatbot</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f9f9f9;
-            color: #333;
-            line-height: 1.6;
-        }
-        h1 {
-            color: #007bff;
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-        p {
-            font-size: 1rem;
-            margin-bottom: 20px;
-        }
-        form {
-            margin-bottom: 20px;
-        }
-        input[type="text"] {
-            width: 75%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            font-size: 1rem;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-        button\:hover {
-            background-color: #0056b3;
-        }
-        .chat-container {
-            margin-top: 20px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 10px;
-            background-color: #ffffff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-        .message {
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-        .user-message {
-            background-color: #d3f9d8;
-            color: #2c7a2c;
-        }
-        .assistant-message {
-            background-color: #e4e4e4;
-            color: #444;
-        }
-    </style>
+    <title>Composite Labs Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Welcome to the Composite Labs and Monad Chatbot</h1>
-    <p>Type your question below and the bot will respond.</p>
-    <form action="/chat" method="post">
-        <input type="text" name="message" placeholder="Ask about Composite Labs or Monad..." required>
-        <button type="submit">Send</button>
-    </form>
-    <div class="chat-container">
+    <div class="chatbot-container">
+        <h1>Welcome to the Composite Labs Chatbot</h1>
+        <p>Type your question below, and the bot will respond:</p>
+
+        <form action="/chat" method="post" class="chat-form">
+            <input type="text" name="message" placeholder="Ask about Composite Labs or Monad..." required>
+            <button type="submit">Send</button>
+        </form>
+
         {% if user_input %}
-        <div class="message user-message">
-            <strong>You:</strong> {{ user_input }}
-        </div>
-        <div class="message assistant-message">
-            <strong>Assistant:</strong> {{ assistant_response }}
+        <div class="chat-container">
+            <div class="message user-message">
+                <strong>You:</strong> {{ user_input }}
+            </div>
+            <div class="message assistant-message">
+                <strong>Assistant:</strong> {{ assistant_response }}
+            </div>
         </div>
         {% endif %}
     </div>
