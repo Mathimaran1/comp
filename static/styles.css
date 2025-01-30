@@ -1,15 +1,19 @@
 /* General Styling */
-body {
-    font-family: Arial, sans-serif;
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
     background-color: #f4f6f8;
     color: #333;
-    line-height: 1.6;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    overflow: hidden;
 }
 
 .chatbot-container {
@@ -48,6 +52,7 @@ body {
     padding: 15px;
     overflow-y: auto;
     background-color: #f9f9f9;
+    border-bottom: 1px solid #ddd;
 }
 
 .messages-container {
@@ -114,6 +119,20 @@ button {
 
 button:hover {
     background-color: #0056b3;
+}
+
+/* Scrollbar Styling */
+.chat-box::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+    background: #007bff;
+    border-radius: 10px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+    background: #f9f9f9;
 }
 
 /* Responsive Design */
